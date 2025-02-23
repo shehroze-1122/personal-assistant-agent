@@ -12,7 +12,7 @@ function Button({
   ...otherProps
 }: ButtonProps) {
   const baseClasses =
-    "px-4 py-2 rounded-md text-white transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2";
+    "px-4 py-2 rounded-md text-white transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-75";
 
   const variantClasses = {
     primary: "bg-blue-500 hover:bg-blue-600 focus:ring-blue-500",

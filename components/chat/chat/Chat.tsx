@@ -33,8 +33,8 @@ function Chat() {
   console.log({ messages });
 
   return (
-    <div className="w-full max-w-2xl rounded-lg border border-tertiary shadow-sm flex flex-col min-h-[80vh]">
-      <div className="flex-1 overflow-y-scroll p-4 space-y-6 max-h-[80vh]">
+    <div className="w-full rounded-lg border-2 border-tertiary shadow-sm flex flex-col min-h-[80vh]">
+      <div className="flex-1 overflow-y-auto p-4 space-y-6 max-h-[80vh]">
         {messages.map((message) => (
           <div key={message.id} className="flex items-start gap-3">
             {message.role === "assistant" ? (
@@ -103,7 +103,7 @@ function Chat() {
         ))}
         <div ref={endRef} />
       </div>
-      <div className="border-t border-tertiary p-4">
+      <div className="border-t-2 border-tertiary p-4">
         <form onSubmit={handleSubmit} className="relative">
           <input
             type="text"
