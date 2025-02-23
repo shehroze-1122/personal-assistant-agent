@@ -7,15 +7,22 @@ import React from "react";
 import Markdown from "../Markdown";
 import { TimeDistributionPieChart } from "@/components/chat/chat/charts/TimeDistributionPieChart";
 import EventFrequencyByDayChart from "./charts/EventFrequencyByDayChart";
+import ConfirmationMessage from "./ConfirmationMessage";
 
 function Chat() {
-  const { messages, input, handleInputChange, handleSubmit, status } = useChat({
+  const {
+    messages,
+    input,
+    handleInputChange,
+    handleSubmit,
+    status,
+    addToolResult,
+  } = useChat({
     onToolCall({ toolCall }) {
       if (toolCall.toolName === "visualizeTimeSpentOnCategoriesTool") {
         return toolCall.args;
       }
       if (toolCall.toolName === "visualizeBusiestDays") {
-        console.log("CALLINGGGGGGGG bussyiii", { toolCall });
         return toolCall.args;
       }
     },
@@ -64,6 +71,26 @@ function Chat() {
                             <EventFrequencyByDayChart
                               key={callId}
                               data={part.toolInvocation.result.data}
+                            />
+                          );
+                        }
+                      case "askForConfirmationTool":
+                        if (
+                          part.toolInvocation.state === "call" ||
+                          part.toolInvocation.state === "result"
+                        ) {
+                          return (
+                            <ConfirmationMessage
+                              key={callId}
+                              addToolResult={addToolResult}
+                              message={part.toolInvocation.args.message}
+                              result={
+                                part.toolInvocation.state === "result"
+                                  ? part.toolInvocation.result
+                                  : undefined
+                              }
+                              state={part.toolInvocation.state}
+                              toolCallId={callId}
                             />
                           );
                         }

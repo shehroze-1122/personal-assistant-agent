@@ -1,6 +1,11 @@
 import { calendar } from "../../calendar";
 import { GaxiosError } from "googleapis-common";
-import { CreateCalendar, GetEventsInput } from "../../tools/schemas";
+import {
+  CreateCalendarEvent,
+  DeleteCalendarEvent,
+  GetEventsInput,
+  UpdateCalendarEvent,
+} from "../../tools/schemas";
 import "server-only";
 
 export const getCalendarEvents = async (props: GetEventsInput) => {
@@ -12,6 +17,7 @@ export const getCalendarEvents = async (props: GetEventsInput) => {
   });
   return (
     response.data.items?.map((event) => ({
+      id: event.id,
       creator: event.creator,
       created: event.created,
       summary: event.summary,
@@ -27,7 +33,7 @@ export const getCalendarEvents = async (props: GetEventsInput) => {
   );
 };
 
-export const createCalendarEvent = async (props: CreateCalendar) => {
+export const createCalendarEvent = async (props: CreateCalendarEvent) => {
   const {
     summary,
     location,
@@ -85,7 +91,7 @@ export const createCalendarEvent = async (props: CreateCalendar) => {
       htmlLink: data.htmlLink,
     };
   } catch (error) {
-    console.log({ error });
+    console.log("Error creating event:", { error });
     if (error instanceof GaxiosError) {
       return error.error;
     } else if (error instanceof Error) {
@@ -94,4 +100,63 @@ export const createCalendarEvent = async (props: CreateCalendar) => {
       return error;
     }
   }
+};
+
+export const updateCalendarEvent = async (args: UpdateCalendarEvent) => {
+  const { eventId, updates } = args;
+  const { startTime, endTime, ...otherUpdates } = updates;
+
+  const updatedEvent = {
+    ...otherUpdates,
+    start: startTime
+      ? {
+          dateTime: startTime,
+          timeZone: "Europe/Berlin",
+        }
+      : undefined,
+    end: endTime
+      ? {
+          dateTime: endTime,
+          timeZone: "Europe/Berlin",
+        }
+      : undefined,
+  };
+
+  try {
+    const response = await calendar.events.patch({
+      calendarId: "shehroze.exp@gmail.com",
+      eventId: eventId,
+      requestBody: updatedEvent,
+    });
+
+    return response.data;
+  } catch (error) {
+    console.log("Error updating event", { error });
+    if (error instanceof GaxiosError) {
+      return error.error;
+    } else if (error instanceof Error) {
+      return error.message;
+    } else {
+      return error;
+    }
+  }
+};
+
+export const deleteCalendarEvents = async (args: DeleteCalendarEvent) => {
+  const deletePromises = args.eventsToDelete.map((event) =>
+    calendar.events.delete({
+      calendarId: "shehroze.exp@gmail.com",
+      eventId: event.eventId,
+      sendUpdates: "all",
+      ...(event.deleteSeries && { recurrenceId: event.eventId }),
+    })
+  );
+
+  const results = await Promise.allSettled(deletePromises);
+
+  return results.map((result) => ({
+    status: result.status,
+    data: result.status === "fulfilled" ? result.value.data : undefined,
+    error: result.status === "rejected" ? result.reason : undefined,
+  }));
 };

@@ -1,3 +1,6 @@
+import clsx, { ClassValue } from "clsx";
+import { twMerge } from "tailwind-merge";
+
 export const timeDifferenceInHours = (start: string, end: string) => {
   const diff = new Date(end).getTime() - new Date(start).getTime();
   return diff / (1000 * 60 * 60);
@@ -17,4 +20,8 @@ export const generateColors = (count: number) => {
       border: `hsla(${hue}, ${saturation}%, ${lightness - 10}%, 1)`, // Darker border for contrast
     };
   });
+};
+
+export const mergeClasses = (...inputs: ClassValue[]) => {
+  return twMerge(clsx(inputs));
 };

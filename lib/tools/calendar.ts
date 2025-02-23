@@ -1,13 +1,21 @@
 import "server-only";
 import { tool as createTool, generateObject } from "ai";
 import {
-  CreateCalendarSchema,
+  AskForConfirmationSchema,
+  CreateCalendarEventSchema,
+  DeleteCalendarEventSchema,
   GetEventsSchema,
   GetEventsWithCategoriesSchema,
   TimeDistributionByCategorySchema,
   TimeDistributionPerDaySchema,
+  UpdateCalendarEventSchema,
 } from "./schemas";
-import { createCalendarEvent, getCalendarEvents } from "../api/calendar";
+import {
+  createCalendarEvent,
+  deleteCalendarEvents,
+  getCalendarEvents,
+  updateCalendarEvent,
+} from "../api/calendar";
 import { openai } from "@ai-sdk/openai";
 import { timeDifferenceInHours } from "../utils";
 
@@ -96,7 +104,25 @@ export const visualizeBusiestDays = createTool({
 
 export const createCalendarEventTool = createTool({
   description:
-    "Create a new event. Always check existing events for time conflict",
-  parameters: CreateCalendarSchema,
+    "Create a new event. Suggest time when not provided. ALWAYS check existing events for time conflict. ALWAYS ask for confirmation using askForConfirmationTool & provide the necessary data",
+  parameters: CreateCalendarEventSchema,
   execute: (args) => createCalendarEvent(args),
+});
+
+export const updateCalendarEventTool = createTool({
+  description: "Update an existing event.",
+  parameters: UpdateCalendarEventSchema,
+  execute: (args) => updateCalendarEvent(args),
+});
+
+export const deleteCalendarEventTool = createTool({
+  description:
+    "Delete events. Ask for confirmation when deleting multiple events or when user event to delete is ambiguous",
+  parameters: DeleteCalendarEventSchema,
+  execute: (args) => deleteCalendarEvents(args),
+});
+
+export const askForConfirmationTool = createTool({
+  description: "Ask the user for confirmation to create a certain event.",
+  parameters: AskForConfirmationSchema,
 });

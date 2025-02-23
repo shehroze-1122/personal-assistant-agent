@@ -1,8 +1,11 @@
 import {
+  askForConfirmationTool,
   createCalendarEventTool,
+  deleteCalendarEventTool,
   getCalendarEventsPerDayDistributionTool,
   getCalendarEventsTool,
   getCalendarEventsWithCategoriesTool,
+  updateCalendarEventTool,
   visualizeBusiestDays,
   visualizeTimeSpentOnCategoriesTool,
 } from "@/lib/tools/calendar";
@@ -35,6 +38,9 @@ export async function POST(req: Request) {
       getCalendarEventsPerDayDistributionTool,
       visualizeBusiestDays,
       createCalendarEventTool,
+      updateCalendarEventTool,
+      deleteCalendarEventTool,
+      askForConfirmationTool,
     },
     onStepFinish({ text, toolCalls, toolResults }) {
       console.log({ text, toolCalls, toolResults });

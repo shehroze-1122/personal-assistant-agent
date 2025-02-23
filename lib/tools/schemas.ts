@@ -76,7 +76,7 @@ export type TimeDistributionPerDay = z.infer<
   typeof TimeDistributionPerDaySchema
 >;
 
-export const CreateCalendarSchema = z.object({
+export const CreateCalendarEventSchema = z.object({
   summary: z.string().describe("Title of the event."),
   location: z.string().optional().describe("Location of the event"),
   description: z.string().optional().describe("Description of the event"),
@@ -93,7 +93,7 @@ export const CreateCalendarSchema = z.object({
   attendees: z
     .array(z.string().email())
     .optional()
-    .describe("List of emails of attendees"),
+    .describe("List of emails of attendees. Only if explicitly mentioned"),
   eventType: z
     .enum([
       "default",
@@ -154,4 +154,63 @@ export const CreateCalendarSchema = z.object({
     ),
 });
 
-export type CreateCalendar = z.infer<typeof CreateCalendarSchema>;
+export type CreateCalendarEvent = z.infer<typeof CreateCalendarEventSchema>;
+
+export const UpdateCalendarEventSchema = z.object({
+  eventId: z.string(),
+  updates: z
+    .object({
+      summary: z.string().optional().describe("Title of the event."),
+      location: z.string().optional().describe("Location of the event"),
+      description: z.string().optional().describe("Description of the event"),
+      startTime: z
+        .string()
+        .describe(
+          "Start time of the event. Must be an RFC3339 timestamp with mandatory time zone offset."
+        ),
+      endTime: z
+        .string()
+        .describe(
+          "End time of the event. Must be an RFC3339 timestamp with mandatory time zone offset."
+        ),
+      attendees: z
+        .array(z.object({ email: z.string().email() }))
+        .optional()
+        .describe("List of attendees with emails"),
+      recurrence: z
+        .array(z.string())
+        .optional()
+        .describe(
+          "List of RRULE, EXRULE, RDATE, and EXDATE lines for a recurring event, as specified in RFC5545."
+        ),
+    })
+    .describe("The updated properties of the event."),
+});
+
+export type UpdateCalendarEvent = z.infer<typeof UpdateCalendarEventSchema>;
+
+export const DeleteCalendarEventSchema = z.object({
+  eventsToDelete: z.array(
+    z.object({
+      eventId: z.string().describe("Id of the event to be deleted"),
+      deleteSeries: z
+        .boolean()
+        .optional()
+        .describe(
+          "Boolean to indicate if all instances of a recurring event should be deleted"
+        ),
+    })
+  ),
+});
+
+export type DeleteCalendarEvent = z.infer<typeof DeleteCalendarEventSchema>;
+
+export const AskForConfirmationSchema = z.object({
+  message: z
+    .string()
+    .describe(
+      "The message to ask for confirmation with relevant details to confirm"
+    ),
+});
+
+export type AskForConfirmation = z.infer<typeof AskForConfirmationSchema>;
