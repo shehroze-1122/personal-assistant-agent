@@ -1,4 +1,3 @@
-import { calendar } from "../../calendar";
 import { GaxiosError } from "googleapis-common";
 import {
   CreateCalendarEvent,
@@ -7,8 +6,12 @@ import {
   UpdateCalendarEvent,
 } from "../../tools/schemas";
 import "server-only";
+import { calendar_v3 } from "googleapis";
 
-export const getCalendarEvents = async (props: GetEventsInput) => {
+export const getCalendarEvents = async (
+  calendar: calendar_v3.Calendar,
+  props: GetEventsInput
+) => {
   const response = await calendar.events.list({
     calendarId: "shehroze.exp@gmail.com",
     maxResults: 2500,
@@ -33,7 +36,10 @@ export const getCalendarEvents = async (props: GetEventsInput) => {
   );
 };
 
-export const createCalendarEvent = async (props: CreateCalendarEvent) => {
+export const createCalendarEvent = async (
+  calendar: calendar_v3.Calendar,
+  props: CreateCalendarEvent
+) => {
   const {
     summary,
     location,
@@ -102,7 +108,10 @@ export const createCalendarEvent = async (props: CreateCalendarEvent) => {
   }
 };
 
-export const updateCalendarEvent = async (args: UpdateCalendarEvent) => {
+export const updateCalendarEvent = async (
+  calendar: calendar_v3.Calendar,
+  args: UpdateCalendarEvent
+) => {
   const { eventId, updates } = args;
   const { startTime, endTime, ...otherUpdates } = updates;
 
@@ -142,7 +151,10 @@ export const updateCalendarEvent = async (args: UpdateCalendarEvent) => {
   }
 };
 
-export const deleteCalendarEvents = async (args: DeleteCalendarEvent) => {
+export const deleteCalendarEvents = async (
+  calendar: calendar_v3.Calendar,
+  args: DeleteCalendarEvent
+) => {
   const deletePromises = args.eventsToDelete.map((event) =>
     calendar.events.delete({
       calendarId: "shehroze.exp@gmail.com",

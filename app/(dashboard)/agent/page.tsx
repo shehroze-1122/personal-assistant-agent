@@ -1,7 +1,13 @@
 "use client";
 
 import Chat from "@/components/chat/chat";
+import Connections from "@/components/connections";
 
 export default function Agent() {
-  return <Chat />;
+  return (
+    <div className="w-full flex flex-col gap-3">
+      <Connections />
+      <Chat />
+    </div>
+  );
 }

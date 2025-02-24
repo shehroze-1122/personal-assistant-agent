@@ -1,5 +1,7 @@
 import "server-only";
 import { tool as createTool, generateObject } from "ai";
+import type { OAuth2Client } from "google-auth-library";
+
 import {
   AskForConfirmationSchema,
   CreateCalendarEventSchema,
@@ -18,111 +20,133 @@ import {
 } from "../api/calendar";
 import { openai } from "@ai-sdk/openai";
 import { timeDifferenceInHours } from "../utils";
+import { createCalendarClient } from "../calendar";
 
-export const getCalendarEventsTool = createTool({
-  description: "Get events from user calendar",
-  parameters: GetEventsSchema,
-  execute: (args) => getCalendarEvents(args),
-});
+export const getCalendarEventsTool = (oauth2Client: OAuth2Client) =>
+  createTool({
+    description: "Get events from user calendar",
+    parameters: GetEventsSchema,
+    execute: (args) =>
+      getCalendarEvents(createCalendarClient(oauth2Client), args),
+  });
 
-export const getCalendarEventsWithCategoriesTool = createTool({
-  description: "Get events from user calendar with categories.",
-  parameters: GetEventsSchema,
-  execute: async (args, { messages }) => {
-    console.log("EXECUTING GET EVENTS WITH CATEGORIES TOOL");
-    const events = await getCalendarEvents(args);
-    const userPrompt = messages.at(-1)?.content;
+export const getCalendarEventsWithCategoriesTool = (
+  oauth2Client: OAuth2Client
+) =>
+  createTool({
+    description: "Get events from user calendar with categories.",
+    parameters: GetEventsSchema,
+    execute: async (args, { messages }) => {
+      console.log("EXECUTING GET EVENTS WITH CATEGORIES TOOL");
+      const calendar = createCalendarClient(oauth2Client);
+      const events = await getCalendarEvents(calendar, args);
+      const userPrompt = messages.at(-1)?.content;
 
-    const { object: eventsWithCategories } = await generateObject({
-      model: openai("gpt-4o-mini"),
-      output: "array",
-      schema: GetEventsWithCategoriesSchema,
-      system:
-        "You are an expert in cateogorizing events to enable efficient time management.",
-      prompt: `
+      const { object: eventsWithCategories } = await generateObject({
+        model: openai("gpt-4o-mini"),
+        output: "array",
+        schema: GetEventsWithCategoriesSchema,
+        system:
+          "You are an expert in cateogorizing events to enable efficient time management.",
+        prompt: `
         ${userPrompt ? `User: ${userPrompt}` : ""}
         Categorize the following events:
         ${events.map((event) => `- ${event.summary}`).join("\n")}
       `,
-    });
-    const summaryToCategoryMap = Object.fromEntries(
-      eventsWithCategories.map((event) => [event.summary, event.category])
-    );
-    const timeSpentOnEachCategory = events.reduce((acc, event) => {
-      if (event.summary && event.start?.dateTime && event.end?.dateTime) {
-        const category = summaryToCategoryMap[event.summary];
-        acc[category] =
-          (acc[category] || 0) +
-          timeDifferenceInHours(event.start.dateTime, event.end.dateTime);
-      }
-      return acc;
-    }, {} as Record<string, number>);
+      });
+      const summaryToCategoryMap = Object.fromEntries(
+        eventsWithCategories.map((event) => [event.summary, event.category])
+      );
+      const timeSpentOnEachCategory = events.reduce((acc, event) => {
+        if (event.summary && event.start?.dateTime && event.end?.dateTime) {
+          const category = summaryToCategoryMap[event.summary];
+          acc[category] =
+            (acc[category] || 0) +
+            timeDifferenceInHours(event.start.dateTime, event.end.dateTime);
+        }
+        return acc;
+      }, {} as Record<string, number>);
 
-    return Object.entries(timeSpentOnEachCategory).map(([category, time]) => ({
-      category,
-      time,
-    }));
-  },
-});
+      return Object.entries(timeSpentOnEachCategory).map(
+        ([category, time]) => ({
+          category,
+          time,
+        })
+      );
+    },
+  });
 
-export const visualizeTimeSpentOnCategoriesTool = createTool({
-  description:
-    "Visualize time spent on each category. Call after getCalendarEventsWithCategoriesTool",
-  parameters: TimeDistributionByCategorySchema,
-});
+export const visualizeTimeSpentOnCategoriesTool = () =>
+  createTool({
+    description:
+      "Visualize time spent on each category. Call after getCalendarEventsWithCategoriesTool",
+    parameters: TimeDistributionByCategorySchema,
+  });
 
-export const getCalendarEventsPerDayDistributionTool = createTool({
-  description: "Get events' counts per day of week",
-  parameters: GetEventsSchema,
-  execute: async (args) => {
-    const events = await getCalendarEvents(args);
-    const numberOfEventsPerDay = events.reduce((acc, event) => {
-      if (event.start && (event.start?.dateTime || event.start?.date)) {
-        const stringDate = event.start.dateTime || event.start.date;
-        const date = new Date(stringDate!);
-        const day = new Intl.DateTimeFormat("en-US", {
-          weekday: "long",
-          timeZone: event.start.timeZone || undefined,
-        }).format(date);
+export const getCalendarEventsPerDayDistributionTool = (
+  oauth2Client: OAuth2Client
+) =>
+  createTool({
+    description: "Get events' counts per day of week",
+    parameters: GetEventsSchema,
+    execute: async (args) => {
+      const calendar = createCalendarClient(oauth2Client);
+      const events = await getCalendarEvents(calendar, args);
+      const numberOfEventsPerDay = events.reduce((acc, event) => {
+        if (event.start && (event.start?.dateTime || event.start?.date)) {
+          const stringDate = event.start.dateTime || event.start.date;
+          const date = new Date(stringDate!);
+          const day = new Intl.DateTimeFormat("en-US", {
+            weekday: "long",
+            timeZone: event.start.timeZone || undefined,
+          }).format(date);
 
-        acc[day] = (acc[day] || 0) + 1;
-      }
-      return acc;
-    }, {} as Record<string, number>);
-    return Object.entries(numberOfEventsPerDay).map(([day, count]) => ({
-      day,
-      count,
-    }));
-  },
-});
+          acc[day] = (acc[day] || 0) + 1;
+        }
+        return acc;
+      }, {} as Record<string, number>);
+      return Object.entries(numberOfEventsPerDay).map(([day, count]) => ({
+        day,
+        count,
+      }));
+    },
+  });
 
-export const visualizeBusiestDays = createTool({
-  description:
-    "Visualize the busiest days(Mon, Tue, etc.) by event count. Recieve data from getCalendarEventsPerDayDistributionTool",
-  parameters: TimeDistributionPerDaySchema,
-});
+export const visualizeBusiestDays = () =>
+  createTool({
+    description:
+      "Visualize the busiest days(Mon, Tue, etc.) by event count. Recieve data from getCalendarEventsPerDayDistributionTool",
+    parameters: TimeDistributionPerDaySchema,
+  });
 
-export const createCalendarEventTool = createTool({
-  description:
-    "Create a new event. Suggest time when not provided. ALWAYS check existing events for time conflict. ALWAYS ask for confirmation using askForConfirmationTool & provide the necessary data",
-  parameters: CreateCalendarEventSchema,
-  execute: (args) => createCalendarEvent(args),
-});
+export const createCalendarEventTool = (oauth2Client: OAuth2Client) =>
+  createTool({
+    description:
+      "Create a new event. Suggest time when not provided. ALWAYS check existing events for time conflict. ALWAYS ask for confirmation using askForConfirmationTool & provide the necessary data",
+    parameters: CreateCalendarEventSchema,
+    execute: (args) =>
+      createCalendarEvent(createCalendarClient(oauth2Client), args),
+  });
 
-export const updateCalendarEventTool = createTool({
-  description: "Update an existing event.",
-  parameters: UpdateCalendarEventSchema,
-  execute: (args) => updateCalendarEvent(args),
-});
+export const updateCalendarEventTool = (oauth2Client: OAuth2Client) =>
+  createTool({
+    description: "Update an existing event.",
+    parameters: UpdateCalendarEventSchema,
+    execute: (args) =>
+      updateCalendarEvent(createCalendarClient(oauth2Client), args),
+  });
 
-export const deleteCalendarEventTool = createTool({
-  description:
-    "Delete events. Ask for confirmation when deleting multiple events or when user event to delete is ambiguous",
-  parameters: DeleteCalendarEventSchema,
-  execute: (args) => deleteCalendarEvents(args),
-});
+export const deleteCalendarEventTool = (oauth2Client: OAuth2Client) =>
+  createTool({
+    description:
+      "Delete events. Ask for confirmation when deleting multiple events or when user event to delete is ambiguous",
+    parameters: DeleteCalendarEventSchema,
+    execute: (args) =>
+      deleteCalendarEvents(createCalendarClient(oauth2Client), args),
+  });
 
-export const askForConfirmationTool = createTool({
-  description: "Ask the user for confirmation to create a certain event.",
-  parameters: AskForConfirmationSchema,
-});
+export const askForConfirmationTool = () =>
+  createTool({
+    description: "Ask the user for confirmation to create a certain event.",
+    parameters: AskForConfirmationSchema,
+  });

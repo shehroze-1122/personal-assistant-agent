@@ -8,6 +8,8 @@ import Markdown from "../Markdown";
 import { TimeDistributionPieChart } from "@/components/chat/chat/charts/TimeDistributionPieChart";
 import EventFrequencyByDayChart from "./charts/EventFrequencyByDayChart";
 import ConfirmationMessage from "./ConfirmationMessage";
+import { generateId } from "ai";
+import { useQueryClient } from "@tanstack/react-query";
 
 function Chat() {
   const {
@@ -17,6 +19,8 @@ function Chat() {
     handleSubmit,
     status,
     addToolResult,
+    setMessages,
+    setInput,
   } = useChat({
     onToolCall({ toolCall }) {
       if (toolCall.toolName === "visualizeTimeSpentOnCategoriesTool") {
@@ -27,23 +31,51 @@ function Chat() {
       }
     },
   });
+  const queryClient = useQueryClient();
 
   const endRef = useScrollToBottom<HTMLDivElement>(messages);
 
   console.log({ messages });
+  const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
 
+    const connectionStatus = queryClient.getQueryData<{
+      connections: { google: boolean };
+    }>(["connectionsStatus"]);
+
+    if (!connectionStatus?.connections.google) {
+      setMessages((prevMessages) => [
+        ...prevMessages,
+        {
+          id: generateId(),
+          role: "user",
+          content: input,
+        },
+        {
+          id: generateId(),
+          role: "assistant",
+          content:
+            "It looks like you haven't connected your Google Calendar. Please connect it to continue.",
+          createdAt: new Date(),
+        },
+      ]);
+      setInput("");
+      return;
+    }
+    handleSubmit(e);
+  };
   return (
     <div className="w-full rounded-lg border-2 border-tertiary shadow-sm flex flex-col min-h-[80vh]">
       <div className="flex-1 overflow-y-auto p-4 space-y-6 max-h-[80vh]">
         {messages.map((message) => (
           <div key={message.id} className="flex items-start gap-3">
             {message.role === "assistant" ? (
-              <div className="w-7 h-7 rounded-full bg-tertiary flex items-center justify-center shrink-0">
-                <Bot className="w-5 h-5" />
+              <div className="w-8 h-8 rounded-full bg-tertiary flex items-center justify-center shrink-0">
+                <Bot className="w-6 h-6" />
               </div>
             ) : (
-              <div className="w-7 h-7 rounded-full bg-tertiary flex items-center justify-center shrink-0">
-                <User className="w-5 h-5" />
+              <div className="w-8 h-8 rounded-full bg-tertiary flex items-center justify-center shrink-0">
+                <User className="w-6 h-6" />
               </div>
             )}
             <div className="text-foreground leading-relaxed">
@@ -104,7 +136,7 @@ function Chat() {
         <div ref={endRef} />
       </div>
       <div className="border-t-2 border-tertiary p-4">
-        <form onSubmit={handleSubmit} className="relative">
+        <form onSubmit={onSubmit} className="relative">
           <input
             type="text"
             value={input}

@@ -1,4 +1,10 @@
 import {
+  getGoogleCredentials,
+  updateGoogleCredentials,
+} from "@/lib/api/supabase/google-credentials";
+import { createOAuth2Client } from "@/lib/calendar";
+import { createClient } from "@/lib/supabase/server";
+import {
   askForConfirmationTool,
   createCalendarEventTool,
   deleteCalendarEventTool,
@@ -26,21 +32,54 @@ export async function POST(req: Request) {
    - Today is ${currentDateTime.toDateString()}
    - Current time is ${currentDateTime.toTimeString()}.
   Carefully resolve the relative time and date for querying the calendar events.`;
+  const supabase = await createClient();
+  const {
+    data: { user },
+    error: authError,
+  } = await supabase.auth.getUser();
+
+  if (authError || !user) {
+    throw new Error("User authentication failed");
+  }
+  const googleCredentials = await getGoogleCredentials(user.id);
+  if (!googleCredentials) {
+    throw new Error("User has not connected their calendar");
+  }
+
+  console.log({ googleCredentials });
+  const oauth2Client = createOAuth2Client();
+  oauth2Client.on("tokens", async (tokens) => {
+    console.log("Updated Tokens", { tokens });
+    if (tokens.access_token || tokens.refresh_token || tokens.expiry_date) {
+      await updateGoogleCredentials(user.id, {
+        access_token: tokens.access_token || undefined,
+        refresh_token: tokens.refresh_token || undefined,
+        expiry_date: tokens.expiry_date || undefined,
+      });
+    }
+  });
+  oauth2Client.setCredentials({
+    refresh_token: googleCredentials.refresh_token,
+    access_token: googleCredentials.access_token,
+    expiry_date: googleCredentials.expiry_date,
+  });
 
   const result = streamText({
     model: openai("gpt-4o-mini"),
     system: systemPrompt,
     messages,
     tools: {
-      getCalendarEventsTool,
-      getCalendarEventsWithCategoriesTool,
-      visualizeTimeSpentOnCategoriesTool,
-      getCalendarEventsPerDayDistributionTool,
-      visualizeBusiestDays,
-      createCalendarEventTool,
-      updateCalendarEventTool,
-      deleteCalendarEventTool,
-      askForConfirmationTool,
+      getCalendarEventsTool: getCalendarEventsTool(oauth2Client),
+      getCalendarEventsWithCategoriesTool:
+        getCalendarEventsWithCategoriesTool(oauth2Client),
+      visualizeTimeSpentOnCategoriesTool: visualizeTimeSpentOnCategoriesTool(),
+      getCalendarEventsPerDayDistributionTool:
+        getCalendarEventsPerDayDistributionTool(oauth2Client),
+      visualizeBusiestDays: visualizeBusiestDays(),
+      createCalendarEventTool: createCalendarEventTool(oauth2Client),
+      updateCalendarEventTool: updateCalendarEventTool(oauth2Client),
+      deleteCalendarEventTool: deleteCalendarEventTool(oauth2Client),
+      askForConfirmationTool: askForConfirmationTool(),
     },
     onStepFinish({ text, toolCalls, toolResults }) {
       console.log({ text, toolCalls, toolResults });

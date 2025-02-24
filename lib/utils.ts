@@ -1,3 +1,4 @@
+import { SupabaseClient } from "@supabase/supabase-js";
 import clsx, { ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 
@@ -24,4 +25,13 @@ export const generateColors = (count: number) => {
 
 export const mergeClasses = (...inputs: ClassValue[]) => {
   return twMerge(clsx(inputs));
+};
+
+export const getUser = async (supabase: SupabaseClient) => {
+  const { data, error } = await supabase.auth.getUser();
+  if (error) {
+    console.error("Error fetching user:", error);
+    return null;
+  }
+  return data.user;
 };
