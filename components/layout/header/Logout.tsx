@@ -1,9 +1,9 @@
 "use client";
-import Button from "@/components/common/Button";
-import { createClient } from "@/lib/supabase/client";
+import React, { useState } from "react";
 import { LogOut } from "lucide-react";
 import { useRouter } from "next/navigation";
-import React, { useState } from "react";
+import Button from "@/components/common/Button";
+import { createClient } from "@/lib/supabase/client";
 
 function Logout() {
   const [loading, setLoading] = useState(false);
@@ -28,12 +28,12 @@ function Logout() {
 
   return (
     <Button
-      className="flex flex-row gap-2 text-sm"
+      className="flex flex-row gap-2 text-sm items-center"
       variant="destructive"
       onClick={logout}
       disabled={loading}
     >
-      {<LogOut className="w-5 h-5" />}
+      {<LogOut className="w-4 h-4" />}
       {loading ? "Logging out..." : "Logout"}
     </Button>
   );
