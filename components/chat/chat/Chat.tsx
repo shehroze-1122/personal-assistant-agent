@@ -2,7 +2,7 @@
 
 import { useScrollToBottom } from "@/hooks/useScrollToBottom";
 import { useChat } from "@ai-sdk/react";
-import { Bot, SendHorizontal, User } from "lucide-react";
+import { Bot, RefreshCcw, SendHorizontal, User } from "lucide-react";
 import React from "react";
 import Markdown from "../Markdown";
 import { TimeDistributionPieChart } from "@/components/chat/chat/charts/TimeDistributionPieChart";
@@ -72,6 +72,9 @@ function Chat() {
       return;
     }
     handleSubmit(e);
+  };
+  const handleReset = () => {
+    setMessages([]);
   };
   return (
     <div className="w-full rounded-lg border-2 border-tertiary shadow-sm flex flex-col min-h-[80vh]">
@@ -145,8 +148,21 @@ function Chat() {
         <div ref={endRef} />
       </div>
       <div className="border-t-2 border-tertiary p-4">
-        <form onSubmit={onSubmit} className="relative">
+        <form
+          onSubmit={onSubmit}
+          className="relative flex flex-row items-center gap-2"
+        >
+          <button
+            className="p-3 shadow-none border border-tertiary rounded-md bg-tertiary"
+            onClick={handleReset}
+          >
+            <RefreshCcw className="w-6 h-6" />
+          </button>
+          <label htmlFor="chat-input" className="sr-only">
+            Your Query
+          </label>
           <input
+            id="chat-input"
             type="text"
             value={input}
             onChange={handleInputChange}
