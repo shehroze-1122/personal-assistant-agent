@@ -24,7 +24,6 @@ ChartJS.register(
 type EventFrequencyByDayChartProps = TimeDistributionPerDay;
 
 const EventFrequencyByDayChart = ({ data }: EventFrequencyByDayChartProps) => {
-  // Initialize an array to store the number of events per day of the week (Sunday to Saturday)
   const daysOfWeek = [
     "Sunday",
     "Monday",
@@ -38,7 +37,6 @@ const EventFrequencyByDayChart = ({ data }: EventFrequencyByDayChartProps) => {
     data.map((event) => [event.day, event.count])
   );
 
-  // Data for the bar chart
   const barChartDataset = {
     labels: daysOfWeek,
     datasets: [
@@ -52,7 +50,6 @@ const EventFrequencyByDayChart = ({ data }: EventFrequencyByDayChartProps) => {
     ],
   };
 
-  // Chart options
   const barChartOptions = {
     responsive: true,
     plugins: {
@@ -67,7 +64,7 @@ const EventFrequencyByDayChart = ({ data }: EventFrequencyByDayChartProps) => {
   };
 
   return (
-    <div className="flex justify-center w-full" style={{ width: "500px" }}>
+    <div className="flex justify-center w-[500px]">
       <Bar data={barChartDataset} options={barChartOptions} />
     </div>
   );

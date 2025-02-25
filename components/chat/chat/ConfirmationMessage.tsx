@@ -24,7 +24,6 @@ function ConfirmationMessage({
   state,
   result,
 }: ConfirmationMessageProps) {
-  console.log({ message, addToolResult, toolCallId, state, result });
   const handleYes = () => {
     addToolResult({ toolCallId, result: "Sounds good." });
   };

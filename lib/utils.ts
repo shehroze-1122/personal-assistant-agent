@@ -35,3 +35,10 @@ export const getUser = async (supabase: SupabaseClient) => {
   }
   return data.user;
 };
+
+export const suggestions = [
+  "What's on my plate for tomorrow?",
+  "Categorically, how much time did I spend on meetings last week?",
+  "Which days were the busiest for me last month?",
+  "Schedule a meeting with Janet on Friday to review designs for QLU 2.0",
+];

@@ -1,26 +1,19 @@
 "use client";
 
+import React from "react";
 import { useScrollToBottom } from "@/hooks/useScrollToBottom";
 import { useChat } from "@ai-sdk/react";
-import { Bot, RefreshCcw, SendHorizontal, User } from "lucide-react";
-import React from "react";
-import Markdown from "../Markdown";
-import { TimeDistributionPieChart } from "@/components/chat/chat/charts/TimeDistributionPieChart";
-import EventFrequencyByDayChart from "./charts/EventFrequencyByDayChart";
-import ConfirmationMessage from "./ConfirmationMessage";
+import { RefreshCcw, SendHorizontal } from "lucide-react";
 import { generateId } from "ai";
 import { useQueryClient } from "@tanstack/react-query";
 import Preferences from "@/components/preferences";
+import { suggestions } from "@/lib/utils";
 import Suggestions from "../suggestions";
 import ChatHeader from "../ChatHeader";
 import IconButton from "@/components/common/IconButton";
-
-const suggestions = [
-  "What's on my plate for tomorrow?",
-  "Categorically, how much time did I spend on meetings last week?",
-  "Which days were the busiest for me last month?",
-  "Schedule a meeting with Janet on Friday to review designs for QLU 2.0",
-];
+import AILoader from "../AILoader";
+import AIError from "../AIError";
+import Message from "./Message";
 
 function Chat() {
   const queryClient = useQueryClient();
@@ -35,6 +28,8 @@ function Chat() {
     setMessages,
     setInput,
     append,
+    error,
+    reload,
   } = useChat({
     onToolCall({ toolCall }) {
       if (toolCall.toolName === "visualizeTimeSpentOnCategoriesTool") {
@@ -56,7 +51,6 @@ function Chat() {
 
   const endRef = useScrollToBottom<HTMLDivElement>(messages);
 
-  console.log({ messages });
   const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
@@ -95,76 +89,20 @@ function Chat() {
       content: prompt,
     });
   };
+
   return (
     <div className="w-full rounded-lg border-2 border-tertiary shadow-sm flex flex-col h-[80vh]">
       <ChatHeader />
       <div className="flex-1 overflow-y-auto p-4 space-y-6 max-h-[100%]">
         {messages.map((message) => (
-          <div key={message.id} className="flex items-start gap-3">
-            {message.role === "assistant" ? (
-              <div className="w-8 h-8 rounded-full bg-tertiary flex items-center justify-center shrink-0">
-                <Bot className="w-6 h-6" />
-              </div>
-            ) : (
-              <div className="w-8 h-8 rounded-full bg-tertiary flex items-center justify-center shrink-0">
-                <User className="w-6 h-6" />
-              </div>
-            )}
-            <div className="text-foreground leading-relaxed">
-              {message.parts.map((part) => {
-                switch (part.type) {
-                  case "text":
-                    return (
-                      <Markdown key={`${message.id}text`}>{part.text}</Markdown>
-                    );
-                  case "tool-invocation": {
-                    const callId = part.toolInvocation.toolCallId;
-                    switch (part.toolInvocation.toolName) {
-                      case "visualizeTimeSpentOnCategoriesTool":
-                        if (part.toolInvocation.state === "result") {
-                          return (
-                            <TimeDistributionPieChart
-                              key={callId}
-                              data={part.toolInvocation.result.data}
-                            />
-                          );
-                        }
-                      case "visualizeBusiestDays":
-                        if (part.toolInvocation.state === "result") {
-                          return (
-                            <EventFrequencyByDayChart
-                              key={callId}
-                              data={part.toolInvocation.result.data}
-                            />
-                          );
-                        }
-                      case "askForConfirmationTool":
-                        if (
-                          part.toolInvocation.state === "call" ||
-                          part.toolInvocation.state === "result"
-                        ) {
-                          return (
-                            <ConfirmationMessage
-                              key={callId}
-                              addToolResult={addToolResult}
-                              message={part.toolInvocation.args.message}
-                              result={
-                                part.toolInvocation.state === "result"
-                                  ? part.toolInvocation.result
-                                  : undefined
-                              }
-                              state={part.toolInvocation.state}
-                              toolCallId={callId}
-                            />
-                          );
-                        }
-                    }
-                  }
-                }
-              })}
-            </div>
-          </div>
+          <Message
+            key={message.id}
+            message={message}
+            addToolResult={addToolResult}
+          />
         ))}
+        {status === "submitted" && <AILoader />}
+        {error && <AIError reload={reload} />}
         {messages.length === 0 && (
           <Suggestions
             suggestions={suggestions}
@@ -193,7 +131,7 @@ function Chat() {
             value={input}
             onChange={handleInputChange}
             placeholder="Send a message..."
-            className="w-full bg-tertiary text-foreground px-4 py-3 pr-12 rounded-md focus:outline-none focus:ring-2 focus:ring-ring"
+            className="w-full bg-tertiary text-foreground px-4 py-3 pr-12 rounded-md"
           />
           <button
             type="submit"
