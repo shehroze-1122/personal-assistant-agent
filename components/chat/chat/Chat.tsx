@@ -94,8 +94,8 @@ function Chat() {
     });
   };
   return (
-    <div className="w-full rounded-lg border-2 border-tertiary shadow-sm flex flex-col min-h-[80vh]">
-      <div className="flex-1 overflow-y-auto p-4 space-y-6 max-h-[80vh]">
+    <div className="w-full rounded-lg border-2 border-tertiary shadow-sm flex flex-col h-[80vh]">
+      <div className="flex-1 overflow-y-auto p-4 space-y-6 max-h-[100%]">
         {messages.map((message) => (
           <div key={message.id} className="flex items-start gap-3">
             {message.role === "assistant" ? (
