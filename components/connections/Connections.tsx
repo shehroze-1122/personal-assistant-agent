@@ -1,18 +1,20 @@
 "use client";
-import { Cable, ChevronDown, ChevronUp, LoaderIcon } from "lucide-react";
 import React, { useState } from "react";
+import { Cable, ChevronDown, ChevronUp } from "lucide-react";
 import { motion } from "framer-motion";
 import ConnectGoogleCalendar from "./ConnectGoogleCalendar";
 import useConnectionsStatus from "./useConnectionsStatus";
 import IconButton from "../common/IconButton";
+import Status from "../common/Status";
+import Loader from "../common/Loader";
 
 function Connections() {
   const [expanded, setIsExpanded] = useState(false);
-  const { data, isLoading } = useConnectionsStatus();
+  const { data, isLoading, isError } = useConnectionsStatus();
   const toggleExpanded = () => {
     setIsExpanded((previousState) => !previousState);
   };
-  console.log({ data });
+
   return (
     <div className="w-full rounded-lg border-2 border-tertiary shadow-sm p-3">
       <div className="flex flex-row justify-between items-center">
@@ -21,10 +23,8 @@ function Connections() {
           Connections
         </h1>
         <div className="flex flex-row items-center gap-3">
-          <div
-            className={`w-3 h-3 rounded-full ${
-              data?.connections.google ? "bg-green-400" : "bg-red-400"
-            }`}
+          <Status
+            status={data?.connections.google ? "connected" : "disconnected"}
           />
           <IconButton disabled={isLoading} onClick={toggleExpanded}>
             {expanded ? (
@@ -41,12 +41,13 @@ function Connections() {
         transition={{ duration: 0.3, ease: "easeInOut" }}
         className="overflow-hidden"
       >
-        {expanded && data && (
-          <div className="mt-3">
+        <div className="mt-3">
+          {expanded && data && (
             <ConnectGoogleCalendar connected={data.connections.google} />
-          </div>
-        )}
-        {isLoading && <LoaderIcon className="animate-spin w-5 h-5 mt-3" />}
+          )}
+          {isLoading && <Loader />}
+          {isError && <p>Failed to get connections.</p>}
+        </div>
       </motion.div>
     </div>
   );

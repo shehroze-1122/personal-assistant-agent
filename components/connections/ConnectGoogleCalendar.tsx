@@ -31,6 +31,7 @@ function ConnectGoogleCalendar({ connected }: ConnectGoogleCalendarProps) {
       });
     }
   };
+
   return (
     <div className="flex flex-row gap-2 items-center">
       <Image src="/google.svg" alt="Google Logo" height={25} width={25} />:{" "}
