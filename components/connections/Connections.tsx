@@ -41,13 +41,15 @@ function Connections() {
         transition={{ duration: 0.3, ease: "easeInOut" }}
         className="overflow-hidden"
       >
-        <div className="mt-3">
-          {expanded && data && (
-            <ConnectGoogleCalendar connected={data.connections.google} />
-          )}
-          {isLoading && <Loader />}
-          {isError && <p>Failed to get connections.</p>}
-        </div>
+        {expanded && (
+          <div className="mt-3">
+            {data && (
+              <ConnectGoogleCalendar connected={data.connections.google} />
+            )}
+            {isLoading && <Loader />}
+            {isError && !data && <p>Failed to get connections.</p>}
+          </div>
+        )}
       </motion.div>
     </div>
   );
