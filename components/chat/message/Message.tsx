@@ -1,9 +1,9 @@
 import React from "react";
 import { UIMessage } from "ai";
-import Markdown from "../../Markdown";
+import Markdown from "../Markdown";
 import { TimeDistributionPieChart } from "../charts/TimeDistributionPieChart";
 import EventFrequencyByDayChart from "../charts/EventFrequencyByDayChart";
-import ConfirmationMessage from "../ConfirmationMessage";
+import ConfirmationMessage from "./ConfirmationMessage";
 import UserAvatar from "./UserAvatar";
 import AssistantAvatar from "./AssistantAvatar";
 

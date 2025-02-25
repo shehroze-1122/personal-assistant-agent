@@ -7,13 +7,13 @@ import { RefreshCcw, SendHorizontal } from "lucide-react";
 import { generateId } from "ai";
 import { useQueryClient } from "@tanstack/react-query";
 import Preferences from "@/components/preferences";
-import { suggestions } from "@/lib/utils";
-import Suggestions from "../suggestions";
-import ChatHeader from "../ChatHeader";
 import IconButton from "@/components/common/IconButton";
-import AILoader from "../AILoader";
-import AIError from "../AIError";
-import Message from "./Message";
+import { suggestions } from "@/lib/utils";
+import Suggestions from "./suggestions";
+import ChatHeader from "./ChatHeader";
+import Message from "./message";
+import AILoader from "./AILoader";
+import AIError from "./AIError";
 
 function Chat() {
   const queryClient = useQueryClient();

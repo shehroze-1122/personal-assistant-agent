@@ -1,6 +1,6 @@
 "use client";
 
-import Chat from "@/components/chat/chat";
+import Chat from "@/components/chat";
 import Connections from "@/components/connections";
 
 export default function Agent() {
