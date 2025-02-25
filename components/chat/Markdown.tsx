@@ -6,7 +6,7 @@ type MarkdownProps = {
   children: string;
 };
 
-const NonMemoizedMarkdown: React.FC<MarkdownProps> = ({ children }) => {
+function NonMemoizedMarkdown({ children }: MarkdownProps) {
   const components: import("react-markdown").Components = {
     ol: ({ children, ...props }) => (
       <ol className="list-decimal ml-4" {...props}>
@@ -40,7 +40,7 @@ const NonMemoizedMarkdown: React.FC<MarkdownProps> = ({ children }) => {
       {children}
     </ReactMarkdown>
   );
-};
+}
 
 const Markdown = React.memo(
   NonMemoizedMarkdown,
