@@ -1,7 +1,7 @@
 "use client";
 
-import { login } from "@/lib/actions";
 import { useActionState } from "react";
+import { login } from "@/lib/actions/auth";
 
 const initialState = {
   message: "",

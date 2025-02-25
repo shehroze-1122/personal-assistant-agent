@@ -18,39 +18,30 @@ export const createGoogleCredentials = async (
     throw new Error("User authentication failed");
   }
 
-  try {
-    const existingToken = await getGoogleCredentials(user.id);
+  const existingToken = await getGoogleCredentials(user.id);
 
-    let response;
+  let response;
 
-    const data = {
-      access_token: credentials.access_token || undefined,
-      expiry_date: credentials.expiry_date || undefined,
-      refresh_token: credentials.refresh_token || undefined,
-    };
-    if (existingToken) {
-      response = await supabase
-        .from("google_credentials")
-        .update(data)
-        .eq("user_id", user.id);
-    } else {
-      response = await supabase
-        .from("google_credentials")
-        .insert({ user_id: user.id, ...data });
-    }
-    console.log({ response, id: user.id });
-    if (response.error) {
-      throw new Error(`Error saving token: ${response.error.message}`);
-    }
-
-    return { success: true };
-  } catch (error) {
-    console.error("Error storing Google credentials:", error);
-    return {
-      success: false,
-      error: error instanceof Error ? error.message : "Something went wrong",
-    };
+  const data = {
+    access_token: credentials.access_token || undefined,
+    expiry_date: credentials.expiry_date || undefined,
+    refresh_token: credentials.refresh_token || undefined,
+  };
+  if (existingToken) {
+    response = await supabase
+      .from("google_credentials")
+      .update(data)
+      .eq("user_id", user.id);
+  } else {
+    response = await supabase
+      .from("google_credentials")
+      .insert({ user_id: user.id, ...data });
   }
+  if (response.error) {
+    throw new Error(`Error saving token: ${response.error.message}`);
+  }
+
+  return { success: true };
 };
 
 export const getGoogleCredentials = async (userId: string) => {
@@ -60,7 +51,7 @@ export const getGoogleCredentials = async (userId: string) => {
     .select("*")
     .eq("user_id", userId)
     .single();
-  console.log({ data, error, userId });
+
   if (error && error.code !== "PGRST116") {
     throw new Error(`Error checking existing token: ${error.message}`);
   }

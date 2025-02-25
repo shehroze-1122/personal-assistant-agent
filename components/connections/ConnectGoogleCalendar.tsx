@@ -1,7 +1,10 @@
 import React, { useState } from "react";
 import Button from "../common/Button";
 import Image from "next/image";
-import { connectGoogleCalendar, disconnectGoogleCalendar } from "@/lib/actions";
+import {
+  connectGoogleCalendar,
+  disconnectGoogleCalendar,
+} from "@/lib/actions/calendar";
 import { useQueryClient } from "@tanstack/react-query";
 import { createClient } from "@/lib/supabase/client";
 import { getUser } from "@/lib/utils";

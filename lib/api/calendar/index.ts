@@ -1,12 +1,12 @@
+import "server-only";
 import { GaxiosError } from "googleapis-common";
+import { calendar_v3 } from "googleapis";
 import {
   CreateCalendarEvent,
   DeleteCalendarEvent,
   GetEventsInput,
   UpdateCalendarEvent,
 } from "../../tools/schemas";
-import "server-only";
-import { calendar_v3 } from "googleapis";
 
 export const getCalendarEvents = async (
   calendar: calendar_v3.Calendar,
@@ -82,7 +82,6 @@ export const createCalendarEvent = async (
       requestBody: event,
     });
     const data = response.data;
-    console.log({ data });
     return {
       creator: data.creator,
       created: data.created,

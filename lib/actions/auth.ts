@@ -1,10 +1,8 @@
 "use server";
-import { createOAuth2Client } from "@/lib/calendar";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { createClient } from "./supabase/server";
 import { z } from "zod";
-import { deleteGoogleCredentials } from "./api/supabase/google-credentials";
+import { createClient } from "../supabase/server";
 
 const loginSchema = z.object({
   email: z.string().email(),
@@ -37,19 +35,4 @@ export const login = async (_: unknown, formData: FormData) => {
 
   revalidatePath("/", "layout");
   redirect("/agent");
-};
-
-export const connectGoogleCalendar = async () => {
-  const oauth2Client = createOAuth2Client();
-  const authUrl = oauth2Client.generateAuthUrl({
-    access_type: "offline",
-    scope: ["https://www.googleapis.com/auth/calendar.events"],
-    prompt: "consent",
-  });
-
-  redirect(authUrl);
-};
-
-export const disconnectGoogleCalendar = async (userId: string) => {
-  return deleteGoogleCredentials(userId);
 };

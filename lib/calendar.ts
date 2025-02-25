@@ -1,15 +1,6 @@
 import "server-only";
-
 import { google } from "googleapis";
 import { OAuth2Client } from "google-auth-library";
-
-// const auth = new google.auth.GoogleAuth({
-//   keyFile: "service-account.json",
-//   scopes: ["https://www.googleapis.com/auth/calendar"],
-// });
-
-// // Get Google Calendar API
-// export const calendar = google.calendar({ version: "v3", auth });
 
 export const createOAuth2Client = () =>
   new google.auth.OAuth2(
