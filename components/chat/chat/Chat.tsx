@@ -12,6 +12,8 @@ import { generateId } from "ai";
 import { useQueryClient } from "@tanstack/react-query";
 
 function Chat() {
+  const queryClient = useQueryClient();
+
   const {
     messages,
     input,
@@ -30,8 +32,15 @@ function Chat() {
         return toolCall.args;
       }
     },
+    body: {
+      preferences: queryClient.getQueryData(["preferences"]),
+    },
+    onFinish() {
+      setTimeout(() => {
+        queryClient.invalidateQueries({ queryKey: ["preferences"] });
+      }, 1000);
+    },
   });
-  const queryClient = useQueryClient();
 
   const endRef = useScrollToBottom<HTMLDivElement>(messages);
 
