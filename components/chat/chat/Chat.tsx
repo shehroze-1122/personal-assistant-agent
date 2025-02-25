@@ -11,6 +11,14 @@ import ConfirmationMessage from "./ConfirmationMessage";
 import { generateId } from "ai";
 import { useQueryClient } from "@tanstack/react-query";
 import Preferences from "@/components/preferences";
+import Suggestions from "../suggestions";
+
+const suggestions = [
+  "What's on my plate for tomorrow?",
+  "Categorically, how much time did I spend on meetings last week?",
+  "Which days were the busiest for me last month?",
+  "Schedule a meeting with Janet on Friday to review designs for QLU 2.0",
+];
 
 function Chat() {
   const queryClient = useQueryClient();
@@ -24,6 +32,7 @@ function Chat() {
     addToolResult,
     setMessages,
     setInput,
+    append,
   } = useChat({
     onToolCall({ toolCall }) {
       if (toolCall.toolName === "visualizeTimeSpentOnCategoriesTool") {
@@ -76,6 +85,13 @@ function Chat() {
   };
   const handleReset = () => {
     setMessages([]);
+  };
+  const handleSuggestionsClick = (prompt: string) => {
+    append({
+      id: generateId(),
+      role: "user",
+      content: prompt,
+    });
   };
   return (
     <div className="w-full rounded-lg border-2 border-tertiary shadow-sm flex flex-col min-h-[80vh]">
@@ -146,6 +162,12 @@ function Chat() {
             </div>
           </div>
         ))}
+        {messages.length === 0 && (
+          <Suggestions
+            suggestions={suggestions}
+            onClick={handleSuggestionsClick}
+          />
+        )}
         <div ref={endRef} />
       </div>
       <Preferences />
