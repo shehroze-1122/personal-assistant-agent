@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import { motion } from "framer-motion";
 import ConnectGoogleCalendar from "./ConnectGoogleCalendar";
 import useConnectionsStatus from "./useConnectionsStatus";
+import IconButton from "../common/IconButton";
 
 function Connections() {
   const [expanded, setIsExpanded] = useState(false);
@@ -25,17 +26,13 @@ function Connections() {
               data?.connections.google ? "bg-green-400" : "bg-red-400"
             }`}
           />
-          <button
-            className=" border-none bg-transparent p-0 m-0 shadow-none"
-            disabled={isLoading}
-            onClick={toggleExpanded}
-          >
+          <IconButton disabled={isLoading} onClick={toggleExpanded}>
             {expanded ? (
               <ChevronUp className="w-5 h-5" />
             ) : (
               <ChevronDown className="w-5 h-5" />
             )}
-          </button>
+          </IconButton>
         </div>
       </div>
       <motion.div

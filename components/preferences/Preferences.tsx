@@ -8,6 +8,7 @@ import {
 } from "lucide-react";
 import { motion } from "framer-motion";
 import usePreferences from "./usePreferences";
+import IconButton from "../common/IconButton";
 
 function Preferences() {
   const [expanded, setIsExpanded] = useState(false);
@@ -22,17 +23,13 @@ function Preferences() {
         <h1 className="flex flex-row items-center gap-1">
           <Save className="w-4 h-4" /> Preferences
         </h1>
-        <button
-          className=" border-none bg-transparent p-0 m-0 shadow-none"
-          disabled={isLoading}
-          onClick={toggleExpanded}
-        >
+        <IconButton disabled={isLoading} onClick={toggleExpanded}>
           {expanded ? (
             <ChevronDown className="w-5 h-5" />
           ) : (
             <ChevronUp className="w-5 h-5" />
           )}
-        </button>
+        </IconButton>
       </div>
       <motion.div
         initial={{ height: 0, opacity: 0 }}

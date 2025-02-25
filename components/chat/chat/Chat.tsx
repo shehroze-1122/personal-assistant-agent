@@ -13,6 +13,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import Preferences from "@/components/preferences";
 import Suggestions from "../suggestions";
 import ChatHeader from "../ChatHeader";
+import IconButton from "@/components/common/IconButton";
 
 const suggestions = [
   "What's on my plate for tomorrow?",
@@ -178,13 +179,11 @@ function Chat() {
           onSubmit={onSubmit}
           className="relative flex flex-row items-center gap-2"
         >
-          <button
-            className="text-foregroundSecondary p-3 shadow-none border border-tertiary rounded-md bg-tertiary hover:text-foreground"
-            onClick={handleReset}
-            type="button"
-          >
-            <RefreshCcw className="w-6 h-6" />
-          </button>
+          <div className="p-3 shadow-none rounded-md bg-tertiary flex items-center justify-center">
+            <IconButton onClick={handleReset} type="button">
+              <RefreshCcw className="w-6 h-6" />
+            </IconButton>
+          </div>
           <label htmlFor="chat-input" className="sr-only">
             Your Query
           </label>
