@@ -17,7 +17,7 @@ function Preferences() {
   };
   console.log({ data });
   return (
-    <div className="w-full rounded-lg border-2 border-tertiary shadow-sm p-3">
+    <div className="w-full rounded-lg border-t-2 border-tertiary shadow-sm p-3">
       <div className="flex flex-row justify-between items-center">
         <h1 className="flex flex-row items-center gap-1">
           <Save className="w-4 h-4" /> Preferences
@@ -28,9 +28,9 @@ function Preferences() {
           onClick={toggleExpanded}
         >
           {expanded ? (
-            <ChevronUp className="w-5 h-5" />
-          ) : (
             <ChevronDown className="w-5 h-5" />
+          ) : (
+            <ChevronUp className="w-5 h-5" />
           )}
         </button>
       </div>

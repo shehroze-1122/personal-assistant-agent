@@ -10,6 +10,7 @@ import EventFrequencyByDayChart from "./charts/EventFrequencyByDayChart";
 import ConfirmationMessage from "./ConfirmationMessage";
 import { generateId } from "ai";
 import { useQueryClient } from "@tanstack/react-query";
+import Preferences from "@/components/preferences";
 
 function Chat() {
   const queryClient = useQueryClient();
@@ -147,6 +148,7 @@ function Chat() {
         ))}
         <div ref={endRef} />
       </div>
+      <Preferences />
       <div className="border-t-2 border-tertiary p-4">
         <form
           onSubmit={onSubmit}
