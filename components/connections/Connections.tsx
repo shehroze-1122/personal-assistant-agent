@@ -1,5 +1,5 @@
 "use client";
-import { ChevronDown, ChevronUp, LoaderIcon } from "lucide-react";
+import { Cable, ChevronDown, ChevronUp, LoaderIcon } from "lucide-react";
 import React, { useState } from "react";
 import { motion } from "framer-motion";
 import ConnectGoogleCalendar from "./ConnectGoogleCalendar";
@@ -15,24 +15,28 @@ function Connections() {
   return (
     <div className="w-full rounded-lg border-2 border-tertiary shadow-sm p-3">
       <div className="flex flex-row justify-between items-center">
-        <h1 className="flex flex-row-reverse items-center gap-1">
+        <h1 className="flex flex-row items-center gap-1">
+          <Cable className="w-4 h-4" />
+          Connections
+        </h1>
+        <div className="flex flex-row items-center gap-3">
           <div
             className={`w-3 h-3 rounded-full ${
               data?.connections.google ? "bg-green-400" : "bg-red-400"
             }`}
-          />{" "}
-          Connections
-        </h1>
-        <button
-          className=" border-none bg-transparent p-0 m-0 shadow-none"
-          onClick={toggleExpanded}
-        >
-          {expanded ? (
-            <ChevronUp className="w-5 h-5" />
-          ) : (
-            <ChevronDown className="w-5 h-5" />
-          )}
-        </button>
+          />
+          <button
+            className=" border-none bg-transparent p-0 m-0 shadow-none"
+            disabled={isLoading}
+            onClick={toggleExpanded}
+          >
+            {expanded ? (
+              <ChevronUp className="w-5 h-5" />
+            ) : (
+              <ChevronDown className="w-5 h-5" />
+            )}
+          </button>
+        </div>
       </div>
       <motion.div
         initial={{ height: 0, opacity: 0 }}
@@ -41,12 +45,7 @@ function Connections() {
         className="overflow-hidden"
       >
         {expanded && data && (
-          <div
-            className={`
-            overflow-hidden transition-all duration-1000 ease-in-out
-            ${expanded ? "max-h-96 opacity-100 mt-3" : "max-h-0 opacity-0"}
-          `}
-          >
+          <div className="mt-3">
             <ConnectGoogleCalendar connected={data.connections.google} />
           </div>
         )}
