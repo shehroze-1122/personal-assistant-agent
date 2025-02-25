@@ -13,7 +13,7 @@ export const getCalendarEvents = async (
   props: GetEventsInput
 ) => {
   const response = await calendar.events.list({
-    calendarId: "shehroze.exp@gmail.com",
+    calendarId: "primary",
     maxResults: 2500,
     singleEvents: true,
     ...props,
@@ -78,7 +78,7 @@ export const createCalendarEvent = async (
 
   try {
     const response = await calendar.events.insert({
-      calendarId: "shehroze.exp@gmail.com",
+      calendarId: "primary",
       requestBody: event,
     });
     const data = response.data;
@@ -133,7 +133,7 @@ export const updateCalendarEvent = async (
 
   try {
     const response = await calendar.events.patch({
-      calendarId: "shehroze.exp@gmail.com",
+      calendarId: "primary",
       eventId: eventId,
       requestBody: updatedEvent,
     });
@@ -157,7 +157,7 @@ export const deleteCalendarEvents = async (
 ) => {
   const deletePromises = args.eventsToDelete.map((event) =>
     calendar.events.delete({
-      calendarId: "shehroze.exp@gmail.com",
+      calendarId: "primary",
       eventId: event.eventId,
       sendUpdates: "all",
       ...(event.deleteSeries && { recurrenceId: event.eventId }),
