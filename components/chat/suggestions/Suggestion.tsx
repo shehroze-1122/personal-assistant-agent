@@ -8,7 +8,8 @@ type SuggestionProps = {
 };
 
 function Suggestion({ suggestion, onClick, className }: SuggestionProps) {
-  const baseClasses = "p-3 border border-tertiary rounded-md shadow-md";
+  const baseClasses =
+    "p-3 border border-tertiary rounded-md shadow-md hover:border-foreground";
   const classes = mergeClasses(baseClasses, className);
 
   const handleClick = () => {

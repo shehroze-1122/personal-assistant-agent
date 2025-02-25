@@ -173,13 +173,13 @@ function Chat() {
         <div ref={endRef} />
       </div>
       <Preferences />
-      <div className="border-t-2 border-tertiary p-4">
+      <div className="border-t-2 border-tertiary p-2">
         <form
           onSubmit={onSubmit}
           className="relative flex flex-row items-center gap-2"
         >
           <button
-            className="p-3 shadow-none border border-tertiary rounded-md bg-tertiary"
+            className="text-foregroundSecondary p-3 shadow-none border border-tertiary rounded-md bg-tertiary hover:text-foreground"
             onClick={handleReset}
             type="button"
           >
