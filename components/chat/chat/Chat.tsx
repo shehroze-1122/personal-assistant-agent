@@ -157,6 +157,7 @@ function Chat() {
           <button
             className="p-3 shadow-none border border-tertiary rounded-md bg-tertiary"
             onClick={handleReset}
+            type="button"
           >
             <RefreshCcw className="w-6 h-6" />
           </button>
