@@ -1,22 +1,18 @@
 import React, { useState } from "react";
-import {
-  CheckCircle,
-  ChevronDown,
-  ChevronUp,
-  LoaderIcon,
-  Save,
-} from "lucide-react";
+import { CheckCircle, ChevronDown, ChevronUp, Save } from "lucide-react";
 import { motion } from "framer-motion";
 import usePreferences from "./usePreferences";
 import IconButton from "../common/IconButton";
+import Loader from "../common/Loader";
 
 function Preferences() {
   const [expanded, setIsExpanded] = useState(false);
-  const { data, isLoading } = usePreferences();
+  const { data, isLoading, isError } = usePreferences();
+
   const toggleExpanded = () => {
     setIsExpanded((previousState) => !previousState);
   };
-  console.log({ data });
+
   return (
     <div className="w-full rounded-lg border-t-2 border-tertiary shadow-sm p-3">
       <div className="flex flex-row justify-between items-center">
@@ -37,22 +33,23 @@ function Preferences() {
         transition={{ duration: 0.3, ease: "easeInOut" }}
         className="overflow-hidden"
       >
-        <div className="mt-3">
-          {expanded && data && (
-            <ul className="space-y-3">
-              {data.map(({ id, preference }) => (
-                <li key={id} className="flex items-start">
-                  <CheckCircle className="h-5 w-5 text-green-500 mr-2 mt-0.5 flex-shrink-0" />
-                  <span>{preference}</span>
-                </li>
-              ))}
-            </ul>
-          )}
-          {isLoading && <LoaderIcon className="animate-spin w-5 h-5 mt-3" />}
-          {!isLoading && data && data.length === 0 && (
-            <p>No preferences saved yet.</p>
-          )}
-        </div>
+        {expanded && (
+          <div className="mt-3">
+            {data && data.length > 0 && (
+              <ul className="space-y-3">
+                {data.map(({ id, preference }) => (
+                  <li key={id} className="flex items-start">
+                    <CheckCircle className="h-5 w-5 text-green-500 mr-2 mt-0.5 flex-shrink-0" />
+                    <span>{preference}</span>
+                  </li>
+                ))}
+              </ul>
+            )}
+            {isLoading && <Loader className="mt-3" />}
+            {data && data.length === 0 && <p>No preferences saved yet.</p>}
+            {!data && isError && <p>Failed to get preferences.</p>}
+          </div>
+        )}
       </motion.div>
     </div>
   );
