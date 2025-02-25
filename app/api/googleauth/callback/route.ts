@@ -16,7 +16,15 @@ export async function GET(req: NextRequest) {
   try {
     const oauth2Client = createOAuth2Client();
     const { tokens } = await oauth2Client.getToken(code);
-    await createGoogleCredentials(tokens);
+    try {
+      await createGoogleCredentials(tokens);
+    } catch (error) {
+      console.error("Error saving token:", error);
+      return NextResponse.json(
+        { error: "Failed to save token" },
+        { status: 500 }
+      );
+    }
     return NextResponse.redirect(
       new URL("/agent", process.env.NEXT_PUBLIC_BASE_URL)
     );
