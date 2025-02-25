@@ -5,7 +5,7 @@ import monogram from "./monogram.png";
 function ChatHeader() {
   return (
     <div className="flex items-center p-2 border-b border-b-tertiary">
-      <div className="relative w-12 h-12 mr-2 rounded-full bg-tertiary overflow-hidden">
+      <div className="relative w-10 h-10 mr-2 rounded-full bg-tertiary overflow-hidden">
         <Image
           src={monogram}
           alt="EngAIagent monogram"
