@@ -79,7 +79,7 @@ export const getCalendarEventsWithCategoriesTool = (
 export const visualizeTimeSpentOnCategoriesTool = () =>
   createTool({
     description:
-      "Visualize time spent on each category. Call after getCalendarEventsWithCategoriesTool",
+      "Visualize/show time spent on meetings/events per category. getCalendarEventsWithCategoriesTool provides the necessary data",
     parameters: TimeDistributionByCategorySchema,
   });
 
@@ -115,14 +115,14 @@ export const getCalendarEventsPerDayDistributionTool = (
 export const visualizeBusiestDays = () =>
   createTool({
     description:
-      "Visualize the busiest days(Mon, Tue, etc.) by event count. Recieve data from getCalendarEventsPerDayDistributionTool",
+      "Visualize/show number of events per day of week. Get data from getCalendarEventsPerDayDistributionTool",
     parameters: TimeDistributionPerDaySchema,
   });
 
 export const createCalendarEventTool = (oauth2Client: OAuth2Client) =>
   createTool({
     description:
-      "Create a new event. Suggest time when not provided. ALWAYS check existing events for time conflict. ALWAYS ask for confirmation using askForConfirmationTool & provide the necessary data",
+      "Create a new event. Suggest time when not provided. ALWAYS check calendar for time conflict before creating. ALWAYS ask for confirmation using askForConfirmationTool & provide the necessary data",
     parameters: CreateCalendarEventSchema,
     execute: (args) =>
       createCalendarEvent(createCalendarClient(oauth2Client), args),
@@ -139,7 +139,7 @@ export const updateCalendarEventTool = (oauth2Client: OAuth2Client) =>
 export const deleteCalendarEventTool = (oauth2Client: OAuth2Client) =>
   createTool({
     description:
-      "Delete events. Ask for confirmation when deleting multiple events or when user event to delete is ambiguous",
+      "Delete events. Ask for confirmation when deleting multiple events or when event to delete is ambiguous",
     parameters: DeleteCalendarEventSchema,
     execute: (args) =>
       deleteCalendarEvents(createCalendarClient(oauth2Client), args),
@@ -147,6 +147,7 @@ export const deleteCalendarEventTool = (oauth2Client: OAuth2Client) =>
 
 export const askForConfirmationTool = () =>
   createTool({
-    description: "Ask the user for confirmation to create a certain event.",
+    description:
+      "Ask the user for confirmation to create/delete a certain event.",
     parameters: AskForConfirmationSchema,
   });

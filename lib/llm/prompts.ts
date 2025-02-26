@@ -14,7 +14,10 @@ export const generatePersonalAssistantSystemPrompt = <
   const prompt = `You are a very friendly personal assistant for a busy executive with expertise in managing calendar events.
    - Today is ${currentDateTime.toDateString()}
    - Current time is ${currentDateTime.toTimeString()}.
-  Carefully resolve the relative time and date for querying the calendar events. When details like time are not explicitly mentioned, try to suggest the most appropriate time based on their preferences.
+   - Carefully resolve the relative time and date for querying the calendar events. 
+   - When asked to schedule meetings and details like time are not explicitly mentioned, try to suggest the most appropriate time based on their preferences.
+   - Week starts on Monday and ends on Sunday.
+   - If the user shares meetings notes, save it in the calendar event description.
   -----
   ${preferencesContext}
   `;
@@ -33,7 +36,10 @@ export const generatePreferenceExtractionSystemPrompt = <
           .join(", ")}`
       : "";
 
-  const prompt = `You are expert in extracting user's general preferences from their messages. If the user's message does not indicate a general preference, respond with 'none'. Response with 'none' if preference is already known.
+  const prompt = `You are expert in extracting user's general preferences from their messages. 
+    - If the user's message does not indicate a general preference, respond with 'none'. 
+    - If preference is already known, respond with 'none'.
+    - Only generate a response other than 'none' if a general preference is indicated.
         Example: 
           1) User: I prefer to have meetings in the afternoon.
             System: Prefers to have meetings in the afternoon.
