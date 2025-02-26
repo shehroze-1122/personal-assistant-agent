@@ -23,11 +23,13 @@ function Message({ message, addToolResult }: MessageProps) {
     <div className="flex items-start gap-3">
       {message.role === "assistant" ? <AssistantAvatar /> : <UserAvatar />}
       <div className="text-foreground leading-relaxed">
-        {message.parts.map((part) => {
+        {message.parts.map((part, index) => {
           switch (part.type) {
             case "text":
               return (
-                <Markdown key={`${message.id}-text`}>{part.text}</Markdown>
+                <Markdown key={`${message.id}-text-${index}`}>
+                  {part.text}
+                </Markdown>
               );
             case "tool-invocation": {
               const callId = part.toolInvocation.toolCallId;
