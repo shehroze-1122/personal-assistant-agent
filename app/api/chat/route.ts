@@ -81,13 +81,19 @@ export async function POST(req: Request) {
       askForConfirmationTool: askForConfirmationTool(),
     },
     async onFinish() {
-      const response = await generateText({
-        model: openai("gpt-4o-mini"),
-        system: generatePreferenceExtractionSystemPrompt(preferences),
-        messages,
-      });
-      if (!response.text.toLowerCase().includes("none")) {
-        saveUserPreference(user.id, response.text);
+      const lastMessage = messages.at(-1);
+      if (lastMessage && lastMessage.role === "user" && lastMessage.content) {
+        const response = await generateText({
+          model: openai("gpt-4o-mini"),
+          system: generatePreferenceExtractionSystemPrompt(preferences),
+          prompt: `
+            Extract the user's general preference from the prompt:
+            ${messages.at(-1)?.content || ""}
+          `,
+        });
+        if (!response.text.toLowerCase().includes("none")) {
+          saveUserPreference(user.id, response.text);
+        }
       }
     },
     maxSteps: 3,
