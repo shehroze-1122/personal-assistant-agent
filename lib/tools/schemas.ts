@@ -165,11 +165,13 @@ export const UpdateCalendarEventSchema = z.object({
       description: z.string().optional().describe("Description of the event"),
       startTime: z
         .string()
+        .optional()
         .describe(
           "Start time of the event. Must be an RFC3339 timestamp with mandatory time zone offset."
         ),
       endTime: z
         .string()
+        .optional()
         .describe(
           "End time of the event. Must be an RFC3339 timestamp with mandatory time zone offset."
         ),
