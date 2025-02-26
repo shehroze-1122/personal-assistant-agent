@@ -81,8 +81,6 @@ export const createCalendarEvent = async (
     endTime,
     attendees,
     eventType,
-    focusTimeProperties,
-    outOfOfficeProperties,
     recurrence,
   } = props;
 
@@ -107,8 +105,6 @@ export const createCalendarEvent = async (
         ? await getAttendees(peopleClient, attendees)
         : undefined,
     eventType,
-    focusTimeProperties,
-    outOfOfficeProperties,
     recurrence,
   };
 

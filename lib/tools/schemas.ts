@@ -106,48 +106,6 @@ export const CreateCalendarEventSchema = z.object({
     ])
     .default("default")
     .describe("Specific event type of event"),
-  outOfOfficeProperties: z
-    .object({
-      autoDeclineMode: z
-        .enum([
-          "declineNone",
-          "declineAllConflictingInvitations",
-          "declineOnlyNewConflictingInvitations",
-        ])
-        .optional()
-        .describe(
-          "Whether to decline meeting invitations which overlap Out of office events"
-        ),
-      declineMessage: z
-        .string()
-        .optional()
-        .describe(
-          "Response message to set if an existing event or new invitation is automatically declined by Calendar."
-        ),
-    })
-    .optional()
-    .describe("Out of office event data. Used if eventType is outOfOffice."),
-  focusTimeProperties: z
-    .object({
-      autoDeclineMode: z
-        .enum([
-          "declineNone",
-          "declineAllConflictingInvitations",
-          "declineOnlyNewConflictingInvitations",
-        ])
-        .optional()
-        .describe(
-          "Whether to decline meeting invitations which overlap focus time events"
-        ),
-      declineMessage: z
-        .string()
-        .optional()
-        .describe(
-          "Response message to set if an existing event or new invitation is automatically declined by Calendar."
-        ),
-    })
-    .optional()
-    .describe("Focus time event data. Used if eventType is focusTime."),
   recurrence: z
     .array(z.string())
     .optional()
