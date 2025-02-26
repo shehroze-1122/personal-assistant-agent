@@ -122,7 +122,7 @@ export const visualizeBusiestDays = () =>
 export const createCalendarEventTool = (oauth2Client: OAuth2Client) =>
   createTool({
     description:
-      "Create a new event. Suggest time when not provided. ALWAYS check calendar for time conflict before creating. ALWAYS ask for confirmation using askForConfirmationTool & provide the necessary data",
+      "Create a new event. Suggest time when not provided. ALWAYS check calendar for time conflict before creating. ALWAYS ask for confirmation using the askForConfirmationTool tool",
     parameters: CreateCalendarEventSchema,
     execute: (args) =>
       createCalendarEvent(
@@ -134,7 +134,8 @@ export const createCalendarEventTool = (oauth2Client: OAuth2Client) =>
 
 export const updateCalendarEventTool = (oauth2Client: OAuth2Client) =>
   createTool({
-    description: "Update an existing event.",
+    description:
+      "Update an existing event. Ask user for confirmation when details like time, etc are not explicitly mentioned.",
     parameters: UpdateCalendarEventSchema,
     execute: (args) =>
       updateCalendarEvent(createCalendarClient(oauth2Client), args),
@@ -152,6 +153,6 @@ export const deleteCalendarEventTool = (oauth2Client: OAuth2Client) =>
 export const askForConfirmationTool = () =>
   createTool({
     description:
-      "Ask the user for confirmation to create/delete a certain event.",
+      "Ask the user for confirmation to create/update/delete a certain event whose details are not super clear.",
     parameters: AskForConfirmationSchema,
   });
