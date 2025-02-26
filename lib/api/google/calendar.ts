@@ -1,12 +1,14 @@
 import "server-only";
 import { GaxiosError } from "googleapis-common";
-import { calendar_v3 } from "googleapis";
+import { calendar_v3, people_v1 } from "googleapis";
 import {
   CreateCalendarEvent,
   DeleteCalendarEvent,
   GetEventsInput,
   UpdateCalendarEvent,
 } from "../../tools/schemas";
+import { isEmail } from "@/lib/utils";
+import { getContactEmailAddress } from "./people";
 
 export const getCalendarEvents = async (
   calendar: calendar_v3.Calendar,
@@ -36,8 +38,39 @@ export const getCalendarEvents = async (
   );
 };
 
+export const getAttendees = async (
+  peopleClient: people_v1.People,
+  attendees: string[]
+): Promise<{ email: string }[]> => {
+  try {
+    const attendeesPromises = attendees.map(async (attendee) => {
+      if (isEmail(attendee)) {
+        return { email: attendee };
+      }
+      const contactEmailAddress = await getContactEmailAddress(
+        peopleClient,
+        attendee
+      );
+      if (contactEmailAddress) return { email: contactEmailAddress };
+      return null;
+    });
+    const resolvedAttendees = await Promise.allSettled(attendeesPromises);
+    const validAttendees = resolvedAttendees.filter(
+      (attendee) => attendee.status === "fulfilled" && attendee.value
+    );
+    return validAttendees.map(
+      (attendee) =>
+        (attendee as PromiseFulfilledResult<{ email: string }>).value
+    );
+  } catch (error) {
+    console.error("Error getting attendees", { error });
+    return [];
+  }
+};
+
 export const createCalendarEvent = async (
   calendar: calendar_v3.Calendar,
+  peopleClient: people_v1.People,
   props: CreateCalendarEvent
 ) => {
   const {
@@ -69,7 +102,10 @@ export const createCalendarEvent = async (
           timeZone: "Europe/Berlin",
         }
       : undefined,
-    attendees: attendees?.map((attendee) => ({ email: attendee })),
+    attendees:
+      attendees && attendees.length > 0
+        ? await getAttendees(peopleClient, attendees)
+        : undefined,
     eventType,
     focusTimeProperties,
     outOfOfficeProperties,

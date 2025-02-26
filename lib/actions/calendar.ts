@@ -7,7 +7,10 @@ export const connectGoogleCalendar = async () => {
   const oauth2Client = createOAuth2Client();
   const authUrl = oauth2Client.generateAuthUrl({
     access_type: "offline",
-    scope: ["https://www.googleapis.com/auth/calendar.events"],
+    scope: [
+      "https://www.googleapis.com/auth/calendar.events",
+      "https://www.googleapis.com/auth/contacts.readonly",
+    ],
     prompt: "consent",
   });
 

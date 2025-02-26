@@ -11,3 +11,6 @@ export const createOAuth2Client = () =>
 
 export const createCalendarClient = (auth: OAuth2Client) =>
   google.calendar({ version: "v3", auth });
+
+export const createPeopleClient = (auth: OAuth2Client) =>
+  google.people({ version: "v1", auth });

@@ -42,3 +42,8 @@ export const suggestions = [
   "Which days were the busiest for me last month?",
   "Schedule a meeting with Janet on Friday to review designs for QLU 2.0",
 ];
+
+export const isEmail = (value: string) => {
+  const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+  return emailRegex.test(value);
+};

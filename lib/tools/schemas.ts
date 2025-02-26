@@ -91,9 +91,11 @@ export const CreateCalendarEventSchema = z.object({
       "End time of the event. Must be an RFC3339 timestamp with mandatory time zone offset."
     ),
   attendees: z
-    .array(z.string().email())
+    .array(z.string())
     .optional()
-    .describe("List of emails of attendees. Only if explicitly mentioned"),
+    .describe(
+      "List containing user provided name or email of attendees. Do not make them up."
+    ),
   eventType: z
     .enum([
       "default",

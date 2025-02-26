@@ -20,7 +20,7 @@ import {
 } from "../api/google/calendar";
 import { openai } from "@ai-sdk/openai";
 import { timeDifferenceInHours } from "../utils";
-import { createCalendarClient } from "../calendar";
+import { createCalendarClient, createPeopleClient } from "../calendar";
 
 export const getCalendarEventsTool = (oauth2Client: OAuth2Client) =>
   createTool({
@@ -125,7 +125,11 @@ export const createCalendarEventTool = (oauth2Client: OAuth2Client) =>
       "Create a new event. Suggest time when not provided. ALWAYS check calendar for time conflict before creating. ALWAYS ask for confirmation using askForConfirmationTool & provide the necessary data",
     parameters: CreateCalendarEventSchema,
     execute: (args) =>
-      createCalendarEvent(createCalendarClient(oauth2Client), args),
+      createCalendarEvent(
+        createCalendarClient(oauth2Client),
+        createPeopleClient(oauth2Client),
+        args
+      ),
   });
 
 export const updateCalendarEventTool = (oauth2Client: OAuth2Client) =>
