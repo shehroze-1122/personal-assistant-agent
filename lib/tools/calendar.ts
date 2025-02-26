@@ -17,7 +17,7 @@ import {
   deleteCalendarEvents,
   getCalendarEvents,
   updateCalendarEvent,
-} from "../api/calendar";
+} from "../api/google/calendar";
 import { openai } from "@ai-sdk/openai";
 import { timeDifferenceInHours } from "../utils";
 import { createCalendarClient } from "../calendar";
