@@ -1,6 +1,7 @@
 import "server-only";
-import { GaxiosError } from "googleapis-common";
 import { calendar_v3, people_v1 } from "googleapis";
+import { timeDifferenceInHours } from "@/lib/utils";
+import { generateEventsCategories } from "@/lib/llm/objects";
 import {
   CreateCalendarEvent,
   DeleteCalendarEvent,
@@ -104,35 +105,24 @@ export const createCalendarEvent = async (
     recurrence,
   };
 
-  try {
-    const response = await calendar.events.insert({
-      calendarId: "primary",
-      requestBody: event,
-    });
-    const data = response.data;
-    return {
-      creator: data.creator,
-      created: data.created,
-      summary: data.summary,
-      description: data.description,
-      eventType: data.eventType,
-      start: data.start,
-      end: data.end,
-      location: data.location,
-      atttendees: data.attendees,
-      status: data.status,
-      htmlLink: data.htmlLink,
-    };
-  } catch (error) {
-    console.log("Error creating event:", { error });
-    if (error instanceof GaxiosError) {
-      return error.error;
-    } else if (error instanceof Error) {
-      return error.message;
-    } else {
-      return error;
-    }
-  }
+  const response = await calendar.events.insert({
+    calendarId: "primary",
+    requestBody: event,
+  });
+  const data = response.data;
+  return {
+    creator: data.creator,
+    created: data.created,
+    summary: data.summary,
+    description: data.description,
+    eventType: data.eventType,
+    start: data.start,
+    end: data.end,
+    location: data.location,
+    atttendees: data.attendees,
+    status: data.status,
+    htmlLink: data.htmlLink,
+  };
 };
 
 export const updateCalendarEvent = async (
@@ -158,24 +148,13 @@ export const updateCalendarEvent = async (
       : undefined,
   };
 
-  try {
-    const response = await calendar.events.patch({
-      calendarId: "primary",
-      eventId: eventId,
-      requestBody: updatedEvent,
-    });
+  const response = await calendar.events.patch({
+    calendarId: "primary",
+    eventId: eventId,
+    requestBody: updatedEvent,
+  });
 
-    return response.data;
-  } catch (error) {
-    console.log("Error updating event", { error });
-    if (error instanceof GaxiosError) {
-      return error.error;
-    } else if (error instanceof Error) {
-      return error.message;
-    } else {
-      return error;
-    }
-  }
+  return response.data;
 };
 
 export const deleteCalendarEvents = async (
@@ -197,5 +176,59 @@ export const deleteCalendarEvents = async (
     status: result.status,
     data: result.status === "fulfilled" ? result.value.data : undefined,
     error: result.status === "rejected" ? result.reason : undefined,
+  }));
+};
+
+export const getCalendarEventsPerDayDistribution = async (
+  calendar: calendar_v3.Calendar,
+  args: GetEventsInput
+) => {
+  const events = await getCalendarEvents(calendar, args);
+  const numberOfEventsPerDay = events.reduce((acc, event) => {
+    if (event.start && (event.start?.dateTime || event.start?.date)) {
+      const stringDate = event.start.dateTime || event.start.date;
+      const date = new Date(stringDate!);
+      const day = new Intl.DateTimeFormat("en-US", {
+        weekday: "long",
+        timeZone: event.start.timeZone || undefined,
+      }).format(date);
+
+      acc[day] = (acc[day] || 0) + 1;
+    }
+    return acc;
+  }, {} as Record<string, number>);
+  return Object.entries(numberOfEventsPerDay).map(([day, count]) => ({
+    day,
+    count,
+  }));
+};
+
+export const getCalendarEventsPerCategory = async (
+  calendar: calendar_v3.Calendar,
+  args: GetEventsInput
+) => {
+  const events = await getCalendarEvents(calendar, args);
+
+  const eventsWithCategories = await generateEventsCategories(
+    events
+      .filter((event) => event.summary)
+      .map((event) => ({ summary: event.summary! }))
+  );
+  const summaryToCategoryMap = Object.fromEntries(
+    eventsWithCategories.map((event) => [event.summary, event.category])
+  );
+  const timeSpentOnEachCategory = events.reduce((acc, event) => {
+    if (event.summary && event.start?.dateTime && event.end?.dateTime) {
+      const category = summaryToCategoryMap[event.summary];
+      acc[category] =
+        (acc[category] || 0) +
+        timeDifferenceInHours(event.start.dateTime, event.end.dateTime);
+    }
+    return acc;
+  }, {} as Record<string, number>);
+
+  return Object.entries(timeSpentOnEachCategory).map(([category, time]) => ({
+    category,
+    time,
   }));
 };
