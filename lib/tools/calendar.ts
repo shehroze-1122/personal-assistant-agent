@@ -37,7 +37,6 @@ export const getCalendarEventsWithCategoriesTool = (
     description: "Get events from user calendar with categories.",
     parameters: GetEventsSchema,
     execute: async (args, { messages }) => {
-      console.log("EXECUTING GET EVENTS WITH CATEGORIES TOOL");
       const calendar = createCalendarClient(oauth2Client);
       const events = await getCalendarEvents(calendar, args);
       const userPrompt = messages.at(-1)?.content;
