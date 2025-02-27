@@ -38,9 +38,9 @@ export const getUser = async (supabase: SupabaseClient) => {
 
 export const suggestions = [
   "What's on my plate for tomorrow?",
-  "Categorically, how much time did I spend on meetings last week?",
-  "Which days were the busiest for me last month?",
-  "Schedule a meeting with Janet on Friday to review designs for QLU 2.0",
+  "How did my distribution of time per category look like last week?",
+  "Please clear my schedule for next Friday",
+  "Schedule a meeting with Janet on Friday to review designs for Engaiagent",
 ];
 
 export const isEmail = (value: string) => {
