@@ -122,7 +122,7 @@ export const visualizeBusiestDays = () =>
 export const createCalendarEventTool = (oauth2Client: OAuth2Client) =>
   createTool({
     description:
-      "Create a new event. Suggest time when not provided. ALWAYS check calendar for time conflict before creating. ALWAYS ask for confirmation using the askForConfirmationTool tool",
+      "Create a new event. ALWAYS check calendar for time conflict before creating. Ask for confirmation using the askForConfirmationTool tool when details like time, etc are not explicitly mentioned.",
     parameters: CreateCalendarEventSchema,
     execute: (args) =>
       createCalendarEvent(

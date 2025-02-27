@@ -5,7 +5,7 @@ export const GetEventsSchema = z.object({
     .string()
     .optional()
     .describe(
-      "Free text search terms to find events that match these terms in the following fields: summary, description, location, attendee's displayName, attendee's email, organizer's displayName, organizer's email, workingLocationProperties.officeLocation.label, workingLocationProperties.customLocation.label."
+      "Free text search terms to find events that match these terms in the following fields: summary, description, location, attendee's displayName, attendee's email. Must use one at a time."
     ),
   timeMax: z
     .string()
