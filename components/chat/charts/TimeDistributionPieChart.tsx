@@ -44,10 +44,7 @@ export const TimeDistributionPieChart = ({
   };
 
   return (
-    <div
-      className="flex justify-center w-full"
-      style={{ width: "500px", height: "700px" }}
-    >
+    <div className="flex justify-center w-full" style={{ width: "500px" }}>
       <Doughnut data={chartData} options={chartOptions} />
     </div>
   );
