@@ -94,7 +94,7 @@ export const CreateCalendarEventSchema = z.object({
     .array(z.string())
     .optional()
     .describe(
-      "List containing user provided name or email of attendees. Do not make them up."
+      "List containing user provided name of attendees. Do not make them up."
     ),
   eventType: z
     .enum([

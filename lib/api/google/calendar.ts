@@ -7,7 +7,6 @@ import {
   GetEventsInput,
   UpdateCalendarEvent,
 } from "../../tools/schemas";
-import { isEmail } from "@/lib/utils";
 import { getContactEmailAddress } from "./people";
 
 export const getCalendarEvents = async (
@@ -44,9 +43,6 @@ export const getAttendees = async (
 ): Promise<{ email: string }[]> => {
   try {
     const attendeesPromises = attendees.map(async (attendee) => {
-      if (isEmail(attendee)) {
-        return { email: attendee };
-      }
       const contactEmailAddress = await getContactEmailAddress(
         peopleClient,
         attendee
