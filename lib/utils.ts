@@ -47,3 +47,6 @@ export const isEmail = (value: string) => {
   const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
   return emailRegex.test(value);
 };
+
+export const isALeapYear = (year: number) =>
+  (year % 4 === 0 && year % 100 !== 0) || year % 400 === 0;
